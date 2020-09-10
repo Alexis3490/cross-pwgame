@@ -1,9 +1,9 @@
 module.exports = api => {
-  api.cache(true)
+    api.cache(true)
 
-  const presets = ['@babel/env', '@babel/typescript']
+    const presets = ['@babel/env', '@babel/typescript']
 
-  return {
-    presets,
-  }
+    return {
+        presets,
+    }
 }

@@ -12,12 +12,12 @@ import moment from 'moment'
  *
  */
 export const isNotNull = (...values: unknown[]): boolean => {
-  for (const v of values) {
-    if (v === undefined || v === null) {
-      return false
+    for (const v of values) {
+        if (v === undefined || v === null) {
+            return false
+        }
     }
-  }
-  return true
+    return true
 }
 
 /**

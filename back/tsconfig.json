@@ -2,11 +2,16 @@
   "compilerOptions": {
     "module": "esnext",
     "target": "esnext",
-    "lib": ["dom", "esnext"],
+    "lib": [
+      "dom",
+      "esnext"
+    ],
     "allowJs": false,
     "esModuleInterop": true,
     "moduleResolution": "node",
     "resolveJsonModule": true
   },
-  "include": ["src"]
+  "include": [
+    "src"
+  ]
 }
