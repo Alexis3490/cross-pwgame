@@ -44,29 +44,94 @@ socketio.on('connection', (socket: Socket) => {
     socket.on('game::sendNickname', payload => {
         const user = JSON.parse(payload)
         const {name_player} = user
-        const elements = {
-            magicNumber: [
-                {
-                    beg: "",
-                    end: "",
-                    player: [
-                        {name: user.name_player, points: 2}
-                    ]
+        let elements;
+        fs.readFile('./db/game.json', function (err, data) {
+            if (String(data) == "") {
+                elements = {
+                    magicNumber: [
+                        {
+                            beg: "",
+                            end: "",
+                            player: [
+                                {name: "", points: ""},
+                                {name: "", points: ""}
+                            ]
+                        }
+                    ],
                 }
-            ],
-        }
-        const data = JSON.stringify(elements, null, 3);
-        fs.writeFile('./db/game.json', data, function (err) {
-            if (err) return console.log(err);
+            } else {
+                elements = JSON.parse(String(data))
+            }
+
+            for (let i = 0; i < elements.magicNumber[0].player.length; i++) {
+                if (elements.magicNumber[0].player[i].name === "") {
+                    elements.magicNumber[0].player[i].name = name_player
+                    i = elements.magicNumber[0].player.length
+                }
+            }
+            const name = JSON.stringify(elements, null, 3);
+            fs.writeFile('./db/game.json', name, function (err) {
+                if (err) return console.log(err);
+            });
         });
+
         //console.log(JSON.parse(data));
         display(chalk.yellow(`Here comes a new challenger : ${name_player} ( from ${socket.id} )`))
 
         users[socket.id] = {name_player}
 
         socket.emit('game::start', {
-            score: 2000,
         })
+    })
 
+    socket.on('game::sendPoint', payload => {
+        const user = JSON.parse(payload)
+        const {status_score, name_player} = user
+        let elements;
+        fs.readFile('./db/game.json', function(err, data) {
+            if(String(data) == "")
+            {
+                elements= {
+                    magicNumber: [
+                        {
+                            beg: "",
+                            end: "",
+                            player: [
+                                {name: "", points: ""},
+                                {name: "", points: ""}
+                            ]
+                        }
+                    ],
+                }
+            }
+            else
+            {
+                elements=JSON.parse(String(data))
+            }
+
+            console.log(status_score)
+            console.log(name_player)
+
+            for(let i=0; i<elements.magicNumber[0].player.length; i++)
+            {
+                if(status_score === 1) {
+                    if (elements.magicNumber[0].player[i].points === "" && elements.magicNumber[0].player[i].name === String(name_player)) {
+                        elements.magicNumber[0].player[i].points = "1"
+                        i = elements.magicNumber[0].player.length
+                    } else if (elements.magicNumber[0].player[i].points !== "" && elements.magicNumber[0].player[i].name === String(name_player)) {
+                        elements.magicNumber[0].player[i].points = String(parseInt(elements.magicNumber[0].player[i].points)+1)
+                        i = elements.magicNumber[0].player.length
+                    }
+                }
+            }
+            const name = JSON.stringify(elements, null, 3);
+            fs.writeFile('./db/game.json', name,function (err) {
+                if (err) return console.log(err);
+            });
+        });
+
+        socket.emit('game::start', {
+            score: 1000,
+        })
     })
 })

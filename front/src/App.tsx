@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import SocketIo from "socket.io-client";
 
 import "./tailwind.output.css";
-import Joueurs from "./Joueurs";
+import Games from "./Games";
 
 
 export default function App(): JSX.Element {
@@ -22,11 +22,11 @@ export default function App(): JSX.Element {
                             type="button"
                             onClick={() => connectIoServer()}
                         >
-                            Join the Games
+                            Join the Game
                         </button>
                     ) : (
                         <div>
-                            <Joueurs io={io}/>
+                            <Games io={io}/>
                         </div>
                     )}
                 </div>

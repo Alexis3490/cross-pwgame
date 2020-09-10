@@ -1,14 +1,18 @@
 {
-  "magicNumber": [
-    {
-      "beg": "",
-      "end": "",
-      "player": [
-        {
-          "name": "te",
-          "points": 2
-        }
-      ]
-    }
-  ]
+   "magicNumber": [
+      {
+         "beg": "",
+         "end": "",
+         "player": [
+            {
+               "name": "po",
+               "points": "2"
+            },
+            {
+               "name": "ze",
+               "points": ""
+            }
+         ]
+      }
+   ]
 }

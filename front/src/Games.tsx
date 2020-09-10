@@ -17,26 +17,23 @@ type Player_2 = {
 };
  */
 
-export default function Joueurs({io}: Props): JSX.Element {
+export default function Games({io}: Props): JSX.Element {
     // const [player_1, setPlayer_1,] = useState<Player_1>();
     //const [player_2, setPlayer_2,] = useState<Player_2>();
     const [name_player, setNamePlayer] = useState('');
     const [score_player, setScorePlayer] = useState(0);
     const [message, setMessage] = useState('');
     const [start, setStart] = useState(false)
-    let resultat: string[] = [];
+    const [status_score, setStatusScore] = useState(0);
 
     const handleNickname = () => {
         io.on("game::start", ({score}: { score: number }) => {
             if (name_player !== "") {
                 setStart(true)
-                console.log(sessionStorage.getItem("joueur 1"))
             }
         });
 
         io.emit("game::sendNickname", JSON.stringify({name_player}));
-
-        //<button className="is-primary">Push me</button>
     };
 
     const validateScore = () => {
@@ -47,13 +44,13 @@ export default function Joueurs({io}: Props): JSX.Element {
                 setMessage('Votre nombre est trop petit')
             } else if (score_player > score) {
                 setMessage('Votre nombre est trop grand')
-            } else if (score_player == score) {
+            } else if (score_player === score) {
+                setStatusScore(1)
+                console.log(name_player);
                 setMessage('Vous avez trouvé le nombre et vous gagné 1 points')
-                sessionStorage.setItem(name_player, String(1))
             }
         });
-
-        io.emit("game::sendNickname", JSON.stringify({name_player}));
+            io.emit("game::sendPoint", JSON.stringify({name_player, status_score}));
     };
 
 
