@@ -37,7 +37,7 @@ export default function Games({io}: Props): JSX.Element {
             }
             if (!start)
             {
-                alert("Les deux joueur ne sont pas connecté")
+                //alert("Les deux joueur ne sont pas connecté")
             }
         });
 
