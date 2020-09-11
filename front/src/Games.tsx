@@ -30,9 +30,15 @@ export default function Games({io}: Props): JSX.Element {
     const [start, setStart] = useState(false)
 
         const handleNickname = () => {
-        io.on("game::start", ({score}: { score: number }) => {
-            if (name_player !== "") {
+        io.on("game::start", ({status}: { status: boolean }) => {
+            console.log(status);
+            if(status)
+            {
                 setStart(true)
+            }
+            if (start)
+            {
+                alert("Les deux joueur ne sont pas connecté")
             }
         });
 

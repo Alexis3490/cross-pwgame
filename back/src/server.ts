@@ -44,6 +44,7 @@ else
 }
 const date_now=`${date.getFullYear()}-0${date.getMonth()+1}-${date.getDate()}T${date.getHours()}:${date.getMinutes()}:${seconds}+${time_zone.substr(4, 2)}:${time_zone.substr(6, 2)}`
 let score=0;
+let status=false
 
 socketio.on('connection', (socket: Socket) => {
     // CURRENT SOCKET/PLAYER
@@ -92,6 +93,11 @@ socketio.on('connection', (socket: Socket) => {
                     elements.magicNumber[0].beg = String(date_now)
                 }
 
+            if(elements.magicNumber[0].player[0].name !== "" && elements.magicNumber[0].player[1].name !== "")
+            {
+                status=true;
+            }
+
             const name = JSON.stringify(elements, null, 3);
             fs.writeFile('./db/game.json', name, function (err) {
                 if (err) return console.log(err);
@@ -104,6 +110,7 @@ socketio.on('connection', (socket: Socket) => {
         users[socket.id] = {name_player}
 
         socket.emit('game::start', {
+            status: status,
         })
     })
 
