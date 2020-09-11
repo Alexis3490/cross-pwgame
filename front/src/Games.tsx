@@ -92,7 +92,9 @@ export default function Games({io}: Props): JSX.Element {
                                                onChange={e => setNamePlayer(e.target.value)}/>
                                     </InputGroup>
                                 </div>
-                                    <Button color="primary"
+                                    <Button
+                                        style={{height:50, width: 100}}
+                                        color="primary"
                                         type="button"
                                         onClick={() => handleNickname()}
                                     >
@@ -103,30 +105,38 @@ export default function Games({io}: Props): JSX.Element {
                         (
                             <>
                                 <div className="mb-4">
-                                    <label className="block text-black text-md font-bold mb-2">
+                                    <h1  style={{fontWeight: "bold", fontSize: "70"}}>
+                                        Magic Numbers
+                                    </h1>
+                                    <h4  style={{fontWeight: "bold", fontSize: "50"}} >
                                         {`Hello ${name_player}`}
-                                    </label>
-                                    <label className="block text-black text-md font-bold mb-2">
-                                        Veuillez un nombre entre 1 et 2000
-                                    </label>
-                                    <label className="block text-black text-md font-bold mb-2">
+                                    </h4>
+                                    <div>
+                                        <label style={{fontSize: "40"}} >
+                                            Veuillez un nombre entre 1 et 1337
+                                        </label>
+                                    </div>
+
+                                    <label style={{fontSize: "30", color: "red"}}>
                                         {message}
                                     </label>
-                                    <input
+                                    <Input
                                         className="shawod appearance-none border rounded py-2 px-4"
                                         placeholder="Score"
                                         onChange={e => setScorePlayer(parseInt(e.target.value))}
                                     />
+
                                     <div className="flex items-center justify-between w-full">
                                         {status_games === 0 ?
                                             (
-                                                <button
-                                                    className="bg-blue-800 hover:bg-red-800 text-white px-2 py-2 rounded-md"
+                                                <Button
+                                                    style={{marginTop: 20, height:50, width: 100}}
+                                                    color="primary"
                                                     type="button"
                                                     onClick={() => validateScore()}
                                                 >
                                                     valider
-                                                </button>
+                                                </Button>
                                             )
                                             : (
                                                 <button

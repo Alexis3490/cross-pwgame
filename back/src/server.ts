@@ -115,6 +115,7 @@ socketio.on('connection', (socket: Socket) => {
         {
             score=Math.round(Math.random() * Math.floor(1337))
         }
+        console.log(score);
         fs.readFile('./db/game.json', function(err, data) {
             if(String(data) == "")
             {
@@ -140,16 +141,23 @@ socketio.on('connection', (socket: Socket) => {
             {
                 if(score_player === score) {
                     if (parseInt(elements.magicNumber[0].player[i].points) < 3) {
-                        if (elements.magicNumber[0].player[i].points === "" && elements.magicNumber[0].player[i].name === String(name_player)) {
+                        if (elements.magicNumber[0].player[i].points === "0" && elements.magicNumber[0].player[i].name === String(name_player)) {
                             elements.magicNumber[0].player[i].points = "1"
-                            i = elements.magicNumber[0].player.length
-                        } else if (elements.magicNumber[0].player[i].points !== "" && elements.magicNumber[0].player[i].name === String(name_player)) {
+                        } else if (elements.magicNumber[0].player[i].points !== "0" && elements.magicNumber[0].player[i].name === String(name_player)) {
                             elements.magicNumber[0].player[i].points = String(parseInt(elements.magicNumber[0].player[i].points) + 1)
                             i = elements.magicNumber[0].player.length
                         }
-                        score = Math.round(Math.random() * Math.floor(1337))
                     }
                 }
+            if(i=== elements.magicNumber[0].player.length)
+            {
+                Math.round(Math.random() * Math.floor(1337))
+            }
+            }
+
+            if(elements.magicNumber[0].player[0].points === "3" || elements.magicNumber[0].player[1].points === "3")
+            {
+                elements.magicNumber[0].end=String(date_now);
             }
 
             const name = JSON.stringify(elements, null, 3);
@@ -191,6 +199,8 @@ socketio.on('connection', (socket: Socket) => {
 
             elements.magicNumber[0].player[0].points="0"
             elements.magicNumber[0].player[1].points="0"
+            elements.magicNumber[0].beg=String(date_now)
+            elements.magicNumber[0].end=""
 
             const name = JSON.stringify(elements, null, 3);
             fs.writeFile('./db/game.json', name,function (err) {
