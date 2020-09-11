@@ -31,12 +31,11 @@ export default function Games({io}: Props): JSX.Element {
 
         const handleNickname = () => {
         io.on("game::start", ({status}: { status: boolean }) => {
-            console.log(status);
             if(status)
             {
                 setStart(true)
             }
-            if (start)
+            if (!start)
             {
                 alert("Les deux joueur ne sont pas connecté")
             }
