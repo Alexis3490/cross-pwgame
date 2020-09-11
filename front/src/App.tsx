@@ -1,5 +1,6 @@
 import React, {useState} from "react";
 import SocketIo from "socket.io-client";
+import { Container, Row, Col, Button } from 'reactstrap';
 
 import "./tailwind.output.css";
 import Games from "./Games";
@@ -13,24 +14,23 @@ export default function App(): JSX.Element {
     };
 
     return (
-        <div className="h-screen flex bg-blue-200">
-            <div className="m-auto">
-                <div className="flex items-center justify-between w-full">
-                    {!io ? (
-                        <button
-                            className="bg-blue-800 hover:bg-red-800 text-white px-8 py-8 rounded-md"
-                            type="button"
-                            onClick={() => connectIoServer()}
-                        >
-                            Join the Game
-                        </button>
-                    ) : (
-                        <div>
-                            <Games io={io}/>
-                        </div>
-                    )}
-                </div>
-            </div>
-        </div>
+        <Container>
+            <Row>
+                <Col sm="12" md={{ size: 6, offset: 4 }}>
+                    <div style={{marginTop: '50%'}}>
+                        {!io ?
+                            (
+                            <Button style={{height: 90, width:200}} color="primary"
+                                    type="button"
+                                    onClick={() => connectIoServer()}>Join games</Button>)
+                            :
+                                (
+                                    <Games io={io}/>
+                                )
+                        }
+                    </div>
+                </Col>
+            </Row>
+        </Container>
     );
 }

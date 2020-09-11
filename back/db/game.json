@@ -1,16 +1,16 @@
 {
    "magicNumber": [
       {
-         "beg": "",
+         "beg": "2020-09-11T22:4:23+02:00",
          "end": "",
          "player": [
             {
-               "name": "po",
-               "points": "2"
+               "name": "test",
+               "points": "0"
             },
             {
-               "name": "ze",
-               "points": ""
+               "name": "ddd",
+               "points": "0"
             }
          ]
       }

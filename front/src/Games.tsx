@@ -1,5 +1,6 @@
 import React, {useState} from "react";
-//import useInput from "./hooks/useInput";
+import {InputGroup, InputGroupAddon, Label,Input, Button} from 'reactstrap';
+
 
 type Props = {
     io: SocketIOClient.Socket;
@@ -22,11 +23,13 @@ export default function Games({io}: Props): JSX.Element {
     //const [player_2, setPlayer_2,] = useState<Player_2>();
     const [name_player, setNamePlayer] = useState('');
     const [score_player, setScorePlayer] = useState(0);
+    const [compteur_player, setCompteurPlayer] = useState(0);
+    const [status_games, setStatusGames] = useState(0);
+
     const [message, setMessage] = useState('');
     const [start, setStart] = useState(false)
-    const [status_score, setStatusScore] = useState(0);
 
-    const handleNickname = () => {
+        const handleNickname = () => {
         io.on("game::start", ({score}: { score: number }) => {
             if (name_player !== "") {
                 setStart(true)
@@ -37,7 +40,7 @@ export default function Games({io}: Props): JSX.Element {
     };
 
     const validateScore = () => {
-        io.on("game::start", ({score}: { score: number }) => {
+        io.on("game::start", ({score}: {score: number}) => {
             if (score_player === 0) {
                 setMessage('Veuillez saisir un nombre')
             } else if (score_player < score) {
@@ -45,39 +48,56 @@ export default function Games({io}: Props): JSX.Element {
             } else if (score_player > score) {
                 setMessage('Votre nombre est trop grand')
             } else if (score_player === score) {
-                setStatusScore(1)
-                console.log(name_player);
                 setMessage('Vous avez trouvé le nombre et vous gagné 1 points')
+                if(compteur_player === 0)
+                {
+                    setCompteurPlayer(1)
+                }
+            else
+                {
+                    setCompteurPlayer(compteur_player+1)
+                }
+            if(compteur_player === 2)
+            {
+                setMessage(`Le joueur ${name_player} à gagner la partie`)
+                setStatusGames(1)
+            }
             }
         });
-            io.emit("game::sendPoint", JSON.stringify({name_player, status_score}));
+            io.emit("game::sendPoint", JSON.stringify({name_player, score_player}));
+    };
+
+    const newGames = () => {
+        io.on("game::start", ({score}: { score: number }) => {
+            setStatusGames(0);
+        });
+
+        io.emit("game::newGames", JSON.stringify({}));
     };
 
 
     return (
-        <div className="m-auto">
-            <div className="w-full max-w-xs">
-                <form className="bg-white shadow-md rounded-lg px-8 py-8 m-4">
+        <div className="">
+                <form className="">
                     {!start ? (
                             <>
                                 <div className="mb-4">
-                                    <label className="block text-black text-md font-bold mb-2">
+                                    <Label style={{fontWeight: "bold"}}>
                                         Veuillez saisir le nom du joueur
-                                    </label>
-                                    <input
-                                        className="shawod appearance-none border rounded py-2 px-4"
-                                        placeholder="Sephiroth"
-                                        onChange={e => setNamePlayer(e.target.value)}/>
+                                    </Label>
+                                    <InputGroup>
+                                        <InputGroupAddon addonType="prepend">
+                                        </InputGroupAddon>
+                                        <Input placeholder="Sephiroth"
+                                               onChange={e => setNamePlayer(e.target.value)}/>
+                                    </InputGroup>
                                 </div>
-                                <div className="flex items-center justify-between w-full">
-                                    <button
-                                        className="bg-blue-800 hover:bg-red-800 text-white px-2 py-2 rounded-md"
+                                    <Button color="primary"
                                         type="button"
                                         onClick={() => handleNickname()}
                                     >
-                                        start
-                                    </button>
-                                </div>
+                                        Start
+                                    </Button>
                             </>)
                         :
                         (
@@ -98,20 +118,32 @@ export default function Games({io}: Props): JSX.Element {
                                         onChange={e => setScorePlayer(parseInt(e.target.value))}
                                     />
                                     <div className="flex items-center justify-between w-full">
-                                        <button
-                                            className="bg-blue-800 hover:bg-red-800 text-white px-2 py-2 rounded-md"
-                                            type="button"
-                                            onClick={() => validateScore()}
-                                        >
-                                            valider
-                                        </button>
+                                        {status_games === 0 ?
+                                            (
+                                                <button
+                                                    className="bg-blue-800 hover:bg-red-800 text-white px-2 py-2 rounded-md"
+                                                    type="button"
+                                                    onClick={() => validateScore()}
+                                                >
+                                                    valider
+                                                </button>
+                                            )
+                                            : (
+                                                <button
+                                                    className="bg-blue-800 hover:bg-red-800 text-white px-2 py-2 rounded-md"
+                                                    type="button"
+                                                    onClick={() => newGames()}
+                                                >
+                                                    new games
+                                                </button>
+                                            )
+                                        }
                                     </div>
                                 </div>
                             </>
                         )
                     }
                 </form>
-            </div>
         </div>
     );
 }

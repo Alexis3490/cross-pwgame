@@ -4,8 +4,8 @@ import chalk from 'chalk'
 import io, {Socket} from 'socket.io'
 import fs from 'fs';
 
-
 import {display, isNull} from './utils'
+import {disconnect} from "cluster";
 
 interface User {
     name_player?: string
@@ -22,15 +22,31 @@ const app = express()
 
 const server = app.listen(port, '127.0.0.1', () => {
     display(chalk.magenta(`crossPWAGame server is running on 0.0.0.0:${port}`))
+
+    fs.writeFile('./db/game.json', "",function (err) {
+        if (err) return console.log(err);
+    });
 })
 
 const socketio = io(server)
 
 const users: Record<string, User> = {}
+const date= new Date();
+const time_zone=date.toString().split(" ")[5];
+let seconds;
+if(date.getSeconds() <10)
+{
+    seconds=`0${date.getSeconds()}`
+}
+else
+{
+    seconds=date.getSeconds()
+}
+const date_now=`${date.getFullYear()}-0${date.getMonth()+1}-${date.getDate()}T${date.getHours()}:${date.getMinutes()}:${seconds}+${time_zone.substr(4, 2)}:${time_zone.substr(6, 2)}`
+let score=0;
 
 socketio.on('connection', (socket: Socket) => {
     // CURRENT SOCKET/PLAYER
-
     display(chalk.cyan(`Connection opened for ( ${socket.id} )`))
 
     socket.on('disconnect', () => {
@@ -53,8 +69,8 @@ socketio.on('connection', (socket: Socket) => {
                             beg: "",
                             end: "",
                             player: [
-                                {name: "", points: ""},
-                                {name: "", points: ""}
+                                {name: "", points: "0"},
+                                {name: "", points: "0"}
                             ]
                         }
                     ],
@@ -63,12 +79,19 @@ socketio.on('connection', (socket: Socket) => {
                 elements = JSON.parse(String(data))
             }
 
+            //Player
             for (let i = 0; i < elements.magicNumber[0].player.length; i++) {
                 if (elements.magicNumber[0].player[i].name === "") {
                     elements.magicNumber[0].player[i].name = name_player
                     i = elements.magicNumber[0].player.length
                 }
             }
+
+            //start
+                if (elements.magicNumber[0].player[0].name !== "" && elements.magicNumber[0].player[1].name !== "") {
+                    elements.magicNumber[0].beg = String(date_now)
+                }
+
             const name = JSON.stringify(elements, null, 3);
             fs.writeFile('./db/game.json', name, function (err) {
                 if (err) return console.log(err);
@@ -86,8 +109,12 @@ socketio.on('connection', (socket: Socket) => {
 
     socket.on('game::sendPoint', payload => {
         const user = JSON.parse(payload)
-        const {status_score, name_player} = user
+        const {score_player, name_player} = user
         let elements;
+        if(score === 0)
+        {
+            score=Math.round(Math.random() * Math.floor(1337))
+        }
         fs.readFile('./db/game.json', function(err, data) {
             if(String(data) == "")
             {
@@ -97,8 +124,8 @@ socketio.on('connection', (socket: Socket) => {
                             beg: "",
                             end: "",
                             player: [
-                                {name: "", points: ""},
-                                {name: "", points: ""}
+                                {name: "", points: "0"},
+                                {name: "", points: "0"}
                             ]
                         }
                     ],
@@ -109,21 +136,22 @@ socketio.on('connection', (socket: Socket) => {
                 elements=JSON.parse(String(data))
             }
 
-            console.log(status_score)
-            console.log(name_player)
-
             for(let i=0; i<elements.magicNumber[0].player.length; i++)
             {
-                if(status_score === 1) {
-                    if (elements.magicNumber[0].player[i].points === "" && elements.magicNumber[0].player[i].name === String(name_player)) {
-                        elements.magicNumber[0].player[i].points = "1"
-                        i = elements.magicNumber[0].player.length
-                    } else if (elements.magicNumber[0].player[i].points !== "" && elements.magicNumber[0].player[i].name === String(name_player)) {
-                        elements.magicNumber[0].player[i].points = String(parseInt(elements.magicNumber[0].player[i].points)+1)
-                        i = elements.magicNumber[0].player.length
+                if(score_player === score) {
+                    if (parseInt(elements.magicNumber[0].player[i].points) < 3) {
+                        if (elements.magicNumber[0].player[i].points === "" && elements.magicNumber[0].player[i].name === String(name_player)) {
+                            elements.magicNumber[0].player[i].points = "1"
+                            i = elements.magicNumber[0].player.length
+                        } else if (elements.magicNumber[0].player[i].points !== "" && elements.magicNumber[0].player[i].name === String(name_player)) {
+                            elements.magicNumber[0].player[i].points = String(parseInt(elements.magicNumber[0].player[i].points) + 1)
+                            i = elements.magicNumber[0].player.length
+                        }
+                        score = Math.round(Math.random() * Math.floor(1337))
                     }
                 }
             }
+
             const name = JSON.stringify(elements, null, 3);
             fs.writeFile('./db/game.json', name,function (err) {
                 if (err) return console.log(err);
@@ -131,7 +159,46 @@ socketio.on('connection', (socket: Socket) => {
         });
 
         socket.emit('game::start', {
-            score: 1000,
+            score: score,
+        })
+    })
+
+    socket.on('game::newGames', payload => {
+        const user = JSON.parse(payload)
+        const {} = user
+        let elements;
+
+        fs.readFile('./db/game.json', function(err, data) {
+            if(String(data) == "")
+            {
+                elements= {
+                    magicNumber: [
+                        {
+                            beg: "",
+                            end: "",
+                            player: [
+                                {name: "", points: "0"},
+                                {name: "", points: "0"}
+                            ]
+                        }
+                    ],
+                }
+            }
+            else
+            {
+                elements=JSON.parse(String(data))
+            }
+
+            elements.magicNumber[0].player[0].points="0"
+            elements.magicNumber[0].player[1].points="0"
+
+            const name = JSON.stringify(elements, null, 3);
+            fs.writeFile('./db/game.json', name,function (err) {
+                if (err) return console.log(err);
+            });
+        });
+
+        socket.emit('game::start', {
         })
     })
 })
