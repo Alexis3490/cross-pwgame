@@ -20,7 +20,7 @@ if (isNull(process.env.PORT)) {
 const port = parseInt(process.env.PORT)
 const app = express()
 
-const server = app.listen(port, '127.0.0.1', () => {
+const server = app.listen(port, () => {
     display(chalk.magenta(`crossPWAGame server is running on 0.0.0.0:${port}`))
 
     fs.writeFile('./db/game.json', "",function (err) {
